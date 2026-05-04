@@ -76,16 +76,16 @@ function DashboardInner() {
   return (
     <div className="h-screen flex flex-col overflow-hidden bg-gray-50">
       {/* Header */}
-      <header className="flex items-center gap-4 px-5 py-3 bg-emerald-800 text-white shadow-lg flex-shrink-0">
+      <header className="flex items-center gap-2 md:gap-4 px-3 md:px-5 py-3 bg-emerald-800 text-white shadow-lg flex-shrink-0">
         <a
           href="/"
-          className="flex items-center gap-2 text-xl font-bold tracking-tight hover:opacity-80 transition-opacity"
+          className="flex items-center gap-2 text-xl font-bold tracking-tight hover:opacity-80 transition-opacity flex-shrink-0"
         >
           <span>🕌</span>
-          <span>Musafir</span>
+          <span className="hidden sm:inline">Musafir</span>
         </a>
 
-        <form onSubmit={handleSearch} className="flex-1 flex gap-2 max-w-md">
+        <form onSubmit={handleSearch} className="flex-1 flex gap-2">
           <input
             value={inputCity}
             onChange={e => setInputCity(e.target.value)}

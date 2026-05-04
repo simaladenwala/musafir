@@ -100,7 +100,7 @@ export default function Map({
     >
       <MapController center={mapCenter} zoom={mapZoom} />
 
-      {/* Filter bar — bottom left, above Google logo */}
+      {/* Filter bar — bottom left, stacked, above Google logo */}
       <div
         style={{
           position: 'absolute',
@@ -110,11 +110,9 @@ export default function Map({
           display: 'flex',
           flexDirection: 'row',
           gap: 6,
-          flexWrap: 'wrap',
-          maxWidth: 'calc(100vw - 80px)',
         }}
       >
-        {/* Type toggles */}
+        {/* Type toggles — stacked vertically */}
         <div
           style={{
             background: 'white',
@@ -122,7 +120,7 @@ export default function Map({
             boxShadow: '0 2px 8px rgba(0,0,0,0.15)',
             padding: '5px 6px',
             display: 'flex',
-            flexDirection: 'row',
+            flexDirection: 'column',
             gap: 3,
           }}
         >
@@ -132,32 +130,32 @@ export default function Map({
               <button
                 key={f.key}
                 onClick={() => toggleType(f.key)}
-                title={f.label}
                 style={{
                   display: 'flex',
                   alignItems: 'center',
-                  gap: 4,
-                  padding: '4px 8px',
+                  gap: 6,
+                  padding: '5px 10px',
                   borderRadius: 6,
                   border: 'none',
                   cursor: 'pointer',
                   background: active ? TYPE_COLOR[f.key] + '22' : '#f3f4f6',
                   color: active ? TYPE_COLOR[f.key] : '#9ca3af',
                   fontWeight: 600,
-                  fontSize: 11,
+                  fontSize: 12,
                   transition: 'all 0.15s',
                   opacity: active ? 1 : 0.55,
                   whiteSpace: 'nowrap',
+                  textAlign: 'left',
                 }}
               >
                 <span style={{ fontSize: 15 }}>{f.emoji}</span>
-                <span className="hidden sm:inline">{f.label}</span>
+                {f.label}
               </button>
             )
           })}
         </div>
 
-        {/* Pin mode toggles */}
+        {/* Pin mode toggles — stacked vertically */}
         <div
           style={{
             background: 'white',
@@ -165,7 +163,7 @@ export default function Map({
             boxShadow: '0 2px 8px rgba(0,0,0,0.15)',
             padding: '5px 6px',
             display: 'flex',
-            flexDirection: 'row',
+            flexDirection: 'column',
             gap: 3,
           }}
         >
@@ -173,25 +171,25 @@ export default function Map({
             <button
               key={m.key}
               onClick={() => setPinMode(m.key)}
-              title={m.label}
               style={{
                 display: 'flex',
                 alignItems: 'center',
-                gap: 4,
-                padding: '4px 8px',
+                gap: 6,
+                padding: '5px 10px',
                 borderRadius: 6,
                 border: 'none',
                 cursor: 'pointer',
                 background: pinMode === m.key ? '#ecfdf5' : '#f3f4f6',
                 color: pinMode === m.key ? '#059669' : '#9ca3af',
                 fontWeight: 600,
-                fontSize: 11,
+                fontSize: 12,
                 transition: 'all 0.15s',
                 whiteSpace: 'nowrap',
+                textAlign: 'left',
               }}
             >
               <span style={{ fontSize: 15 }}>{m.icon}</span>
-              <span className="hidden sm:inline">{m.label}</span>
+              {m.label}
             </button>
           ))}
         </div>
