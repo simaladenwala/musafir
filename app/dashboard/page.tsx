@@ -3,6 +3,7 @@
 import { useState, useEffect, Suspense } from 'react'
 import { useSearchParams, useRouter } from 'next/navigation'
 import { APIProvider } from '@vis.gl/react-google-maps'
+import Script from 'next/script'
 import Map from '@/components/Map'
 import PlacesList from '@/components/PlacesList'
 import NeighborhoodSuggestions from '@/components/NeighborhoodSuggestions'
@@ -33,6 +34,7 @@ function DashboardInner() {
   )
   const [showText, setShowText] = useState(false)
   const [showPhoto, setShowPhoto] = useState(false)
+  const [showSubscribe, setShowSubscribe] = useState(false)
 
   function toggleType(type: string) {
     setVisibleTypes(prev => {
@@ -270,6 +272,14 @@ function DashboardInner() {
                   🖼️ Photo
                 </button>
               </div>
+
+              {/* Subscribe button */}
+              <button
+                onClick={() => setShowSubscribe(true)}
+                className="ml-auto flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold bg-emerald-600 text-white hover:bg-emerald-700 transition-all flex-shrink-0"
+              >
+                ✉️ Subscribe
+              </button>
             </div>
 
             {/* Map */}
@@ -289,6 +299,34 @@ function DashboardInner() {
               </APIProvider>
             </div>
           </div>
+          </div>
+        </div>
+      )}
+
+      {/* Subscribe modal */}
+      {showSubscribe && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50"
+          onClick={() => setShowSubscribe(false)}
+        >
+          <div
+            className="bg-white rounded-2xl p-6 w-full max-w-md shadow-2xl relative"
+            onClick={e => e.stopPropagation()}
+          >
+            <button
+              onClick={() => setShowSubscribe(false)}
+              className="absolute top-3 right-4 text-gray-400 hover:text-gray-600 text-xl font-bold"
+            >
+              ×
+            </button>
+            <div className="text-2xl mb-1">✉️</div>
+            <h2 className="text-lg font-bold text-gray-800 mb-1">Stay in the loop</h2>
+            <p className="text-sm text-gray-500 mb-4">Get updates on new cities and features for Muslim travelers.</p>
+            <Script
+              async
+              src="https://subscribe-forms.beehiiv.com/v3/loader.js"
+              data-beehiiv-form="9539f830-2800-4ecb-9af0-d904ef06e703"
+            />
           </div>
         </div>
       )}
