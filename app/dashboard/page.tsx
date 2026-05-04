@@ -35,6 +35,19 @@ function DashboardInner() {
   const [showPhoto, setShowPhoto] = useState(false)
   const [showSubscribe, setShowSubscribe] = useState(false)
 
+  useEffect(() => {
+    if (!showSubscribe) return
+    const container = document.getElementById('beehiiv-container')
+    if (!container) return
+    container.innerHTML = ''
+    const script = document.createElement('script')
+    script.src = 'https://subscribe-forms.beehiiv.com/v3/loader.js'
+    script.async = true
+    script.setAttribute('data-beehiiv-form', '9539f830-2800-4ecb-9af0-d904ef06e703')
+    container.appendChild(script)
+    return () => { container.innerHTML = '' }
+  }, [showSubscribe])
+
   function toggleType(type: string) {
     setVisibleTypes(prev => {
       const next = new Set(prev)
@@ -321,13 +334,7 @@ function DashboardInner() {
             <div className="text-2xl mb-1">✉️</div>
             <h2 className="text-lg font-bold text-gray-800 mb-1">Stay in the loop</h2>
             <p className="text-sm text-gray-500 mb-4">Get updates on new cities and features for Muslim travelers.</p>
-            <iframe
-              src="https://embeds.beehiiv.com/9539f830-2800-4ecb-9af0-d904ef06e703"
-              data-test-id="beehiiv-embed"
-              width="100%"
-              height="320"
-              style={{ borderRadius: 8, border: 'none' }}
-            />
+            <div id="beehiiv-container" />
           </div>
         </div>
       )}
