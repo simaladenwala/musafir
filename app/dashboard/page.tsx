@@ -3,7 +3,6 @@
 import { useState, useEffect, Suspense } from 'react'
 import { useSearchParams, useRouter } from 'next/navigation'
 import { APIProvider } from '@vis.gl/react-google-maps'
-import Script from 'next/script'
 import Map from '@/components/Map'
 import PlacesList from '@/components/PlacesList'
 import NeighborhoodSuggestions from '@/components/NeighborhoodSuggestions'
@@ -322,10 +321,12 @@ function DashboardInner() {
             <div className="text-2xl mb-1">✉️</div>
             <h2 className="text-lg font-bold text-gray-800 mb-1">Stay in the loop</h2>
             <p className="text-sm text-gray-500 mb-4">Get updates on new cities and features for Muslim travelers.</p>
-            <Script
-              async
-              src="https://subscribe-forms.beehiiv.com/v3/loader.js"
-              data-beehiiv-form="9539f830-2800-4ecb-9af0-d904ef06e703"
+            <iframe
+              src="https://embeds.beehiiv.com/9539f830-2800-4ecb-9af0-d904ef06e703"
+              data-test-id="beehiiv-embed"
+              width="100%"
+              height="320"
+              style={{ borderRadius: 8, border: 'none' }}
             />
           </div>
         </div>
