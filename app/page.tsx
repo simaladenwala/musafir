@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
+import Script from 'next/script'
 
 const QUICK_CITIES = [
   'Houston, TX',
@@ -85,6 +86,17 @@ export default function HomePage() {
               </button>
             ))}
           </div>
+        </div>
+
+        {/* Newsletter */}
+        <div className="mt-10 bg-white/10 backdrop-blur rounded-2xl p-6 max-w-lg mx-auto">
+          <p className="text-white font-semibold mb-1">Stay in the loop</p>
+          <p className="text-emerald-200 text-sm mb-4">Get updates on new cities and features.</p>
+          <Script
+            async
+            src="https://subscribe-forms.beehiiv.com/v3/loader.js"
+            data-beehiiv-form="9539f830-2800-4ecb-9af0-d904ef06e703"
+          />
         </div>
       </div>
     </main>
