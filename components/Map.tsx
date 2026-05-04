@@ -76,31 +76,73 @@ export default function Map({
       {/* Place markers */}
       {places.map(place => {
         const isSelected = selectedPlace?.id === place.id
+        const photoUrl = place.photos[0]
+          ? `/api/photo?name=${encodeURIComponent(place.photos[0])}`
+          : null
         return (
           <AdvancedMarker
             key={place.id}
             position={{ lat: place.lat, lng: place.lng }}
             onClick={() => onSelectPlace(isSelected ? null : place)}
           >
-            <div
-              style={{
-                width: isSelected ? 46 : 34,
-                height: isSelected ? 46 : 34,
-                backgroundColor: TYPE_COLOR[place.type],
-                borderRadius: '50%',
-                border: '2.5px solid white',
-                boxShadow: isSelected
-                  ? '0 0 0 3px rgba(5,150,105,0.4), 0 4px 12px rgba(0,0,0,0.3)'
-                  : '0 2px 6px rgba(0,0,0,0.25)',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                fontSize: isSelected ? 22 : 16,
-                cursor: 'pointer',
-                transition: 'all 0.15s',
-              }}
-            >
-              {TYPE_ICON[place.type]}
+            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', cursor: 'pointer' }}>
+              {/* Label card above pin */}
+              <div
+                style={{
+                  background: 'white',
+                  borderRadius: 8,
+                  boxShadow: isSelected
+                    ? '0 0 0 2px rgba(5,150,105,0.5), 0 4px 12px rgba(0,0,0,0.2)'
+                    : '0 2px 8px rgba(0,0,0,0.18)',
+                  overflow: 'hidden',
+                  width: 110,
+                  marginBottom: 4,
+                  border: isSelected ? `2px solid ${TYPE_COLOR[place.type]}` : '2px solid transparent',
+                  transition: 'all 0.15s',
+                }}
+              >
+                {photoUrl && (
+                  <img
+                    src={photoUrl}
+                    alt={place.name}
+                    style={{ width: '100%', height: 60, objectFit: 'cover', display: 'block' }}
+                    onError={e => { (e.target as HTMLImageElement).style.display = 'none' }}
+                  />
+                )}
+                <div
+                  style={{
+                    padding: '3px 5px',
+                    fontSize: 10,
+                    fontWeight: 600,
+                    color: '#1f2937',
+                    lineHeight: 1.3,
+                    textAlign: 'center',
+                  }}
+                >
+                  {place.name.length > 22 ? place.name.slice(0, 22) + '…' : place.name}
+                </div>
+              </div>
+
+              {/* Pin circle */}
+              <div
+                style={{
+                  width: isSelected ? 36 : 28,
+                  height: isSelected ? 36 : 28,
+                  backgroundColor: TYPE_COLOR[place.type],
+                  borderRadius: '50%',
+                  border: '2.5px solid white',
+                  boxShadow: isSelected
+                    ? '0 0 0 3px rgba(5,150,105,0.4), 0 4px 12px rgba(0,0,0,0.3)'
+                    : '0 2px 6px rgba(0,0,0,0.25)',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  fontSize: isSelected ? 18 : 14,
+                  transition: 'all 0.15s',
+                }}
+              >
+                {TYPE_ICON[place.type]}
+              </div>
             </div>
           </AdvancedMarker>
         )
