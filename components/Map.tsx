@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect } from 'react'
 import {
   Map as GoogleMap,
   AdvancedMarker,
@@ -30,6 +30,9 @@ interface MapProps {
   onSelectPlace: (p: Place | null) => void
   neighborhoods: Neighborhood[]
   showNeighborhoods: boolean
+  visibleTypes: Set<string>
+  showText: boolean
+  showPhoto: boolean
 }
 
 function MapController({
@@ -56,38 +59,17 @@ export default function Map({
   onSelectPlace,
   neighborhoods,
   showNeighborhoods,
+  visibleTypes,
+  showText,
+  showPhoto,
 }: MapProps) {
   const mapCenter = selectedPlace
     ? { lat: selectedPlace.lat, lng: selectedPlace.lng }
     : cityCenter
   const mapZoom = selectedPlace ? 16 : 11
 
-  const [visibleTypes, setVisibleTypes] = useState<Set<string>>(
-    new Set(['masjid', 'halal_restaurant', 'halal_meat'])
-  )
-  const [pinMode, setPinMode] = useState<'photo' | 'name' | 'pin'>('photo')
-
-  const PIN_MODES: { key: 'photo' | 'name' | 'pin'; label: string; icon: string }[] = [
-    { key: 'photo', label: 'Photo + Name', icon: '🖼️' },
-    { key: 'name', label: 'Name only', icon: '🏷️' },
-    { key: 'pin', label: 'Pins only', icon: '📍' },
-  ]
-
-  function toggleType(type: string) {
-    setVisibleTypes(prev => {
-      const next = new Set(prev)
-      next.has(type) ? next.delete(type) : next.add(type)
-      return next
-    })
-  }
-
+  const pinMode = showPhoto ? 'photo' : showText ? 'name' : 'pin'
   const visiblePlaces = places.filter(p => visibleTypes.has(p.type))
-
-  const TYPE_FILTERS = [
-    { key: 'masjid', label: 'Masjids', emoji: '🕌' },
-    { key: 'halal_restaurant', label: 'Eats', emoji: '🍽️' },
-    { key: 'halal_meat', label: 'Meat', emoji: '🥩' },
-  ]
 
   return (
     <GoogleMap
@@ -99,101 +81,6 @@ export default function Map({
       style={{ width: '100%', height: '100%' }}
     >
       <MapController center={mapCenter} zoom={mapZoom} />
-
-      {/* Filter bar — bottom left, stacked, above Google logo */}
-      <div
-        style={{
-          position: 'absolute',
-          bottom: 90,
-          left: 12,
-          zIndex: 10,
-          display: 'flex',
-          flexDirection: 'row',
-          gap: 6,
-        }}
-      >
-        {/* Type toggles — stacked vertically */}
-        <div
-          style={{
-            background: 'white',
-            borderRadius: 10,
-            boxShadow: '0 2px 8px rgba(0,0,0,0.15)',
-            padding: '5px 6px',
-            display: 'flex',
-            flexDirection: 'column',
-            gap: 3,
-          }}
-        >
-          {TYPE_FILTERS.map(f => {
-            const active = visibleTypes.has(f.key)
-            return (
-              <button
-                key={f.key}
-                onClick={() => toggleType(f.key)}
-                style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: 6,
-                  padding: '5px 10px',
-                  borderRadius: 6,
-                  border: 'none',
-                  cursor: 'pointer',
-                  background: active ? TYPE_COLOR[f.key] + '22' : '#f3f4f6',
-                  color: active ? TYPE_COLOR[f.key] : '#9ca3af',
-                  fontWeight: 600,
-                  fontSize: 12,
-                  transition: 'all 0.15s',
-                  opacity: active ? 1 : 0.55,
-                  whiteSpace: 'nowrap',
-                  textAlign: 'left',
-                }}
-              >
-                <span style={{ fontSize: 15 }}>{f.emoji}</span>
-                {f.label}
-              </button>
-            )
-          })}
-        </div>
-
-        {/* Pin mode toggles — stacked vertically */}
-        <div
-          style={{
-            background: 'white',
-            borderRadius: 10,
-            boxShadow: '0 2px 8px rgba(0,0,0,0.15)',
-            padding: '5px 6px',
-            display: 'flex',
-            flexDirection: 'column',
-            gap: 3,
-          }}
-        >
-          {PIN_MODES.map(m => (
-            <button
-              key={m.key}
-              onClick={() => setPinMode(m.key)}
-              style={{
-                display: 'flex',
-                alignItems: 'center',
-                gap: 6,
-                padding: '5px 10px',
-                borderRadius: 6,
-                border: 'none',
-                cursor: 'pointer',
-                background: pinMode === m.key ? '#ecfdf5' : '#f3f4f6',
-                color: pinMode === m.key ? '#059669' : '#9ca3af',
-                fontWeight: 600,
-                fontSize: 12,
-                transition: 'all 0.15s',
-                whiteSpace: 'nowrap',
-                textAlign: 'left',
-              }}
-            >
-              <span style={{ fontSize: 15 }}>{m.icon}</span>
-              {m.label}
-            </button>
-          ))}
-        </div>
-      </div>
 
       {/* Place markers */}
       {visiblePlaces.map(place => {
@@ -208,7 +95,6 @@ export default function Map({
             onClick={() => onSelectPlace(isSelected ? null : place)}
           >
             <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', cursor: 'pointer' }}>
-              {/* Label card above pin — hidden in pin-only mode */}
               {pinMode !== 'pin' && (
                 <div
                   style={{
@@ -247,7 +133,6 @@ export default function Map({
                 </div>
               )}
 
-              {/* Pin circle */}
               <div
                 style={{
                   width: isSelected ? 36 : 28,

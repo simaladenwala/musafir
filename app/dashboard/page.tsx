@@ -28,6 +28,25 @@ function DashboardInner() {
   const [selectedPlace, setSelectedPlace] = useState<Place | null>(null)
   const [activeTab, setActiveTab] = useState<Tab>('masjid')
   const [mobileView, setMobileView] = useState<'map' | 'list'>('map')
+  const [visibleTypes, setVisibleTypes] = useState<Set<string>>(
+    new Set(['masjid', 'halal_restaurant', 'halal_meat'])
+  )
+  const [showText, setShowText] = useState(false)
+  const [showPhoto, setShowPhoto] = useState(false)
+
+  function toggleType(type: string) {
+    setVisibleTypes(prev => {
+      const next = new Set(prev)
+      next.has(type) ? next.delete(type) : next.add(type)
+      return next
+    })
+  }
+
+  const TYPE_FILTERS = [
+    { key: 'masjid', label: 'Masjids', emoji: '🕌', activeColor: 'bg-emerald-100 text-emerald-700' },
+    { key: 'halal_restaurant', label: 'Eats', emoji: '🍽️', activeColor: 'bg-amber-100 text-amber-700' },
+    { key: 'halal_meat', label: 'Meat', emoji: '🥩', activeColor: 'bg-red-100 text-red-700' },
+  ]
 
   const cityParam = searchParams.get('city') ?? ''
 
@@ -208,18 +227,67 @@ function DashboardInner() {
           </aside>
 
           {/* Map */}
-          <div className={`${mobileView === 'map' ? 'flex' : 'hidden'} md:flex flex-1 relative`}>
-            <APIProvider apiKey={process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY ?? ''}>
-              <Map
-                places={result.places}
-                cityCenter={result.cityCenter}
-                selectedPlace={selectedPlace}
-                onSelectPlace={setSelectedPlace}
-                neighborhoods={result.neighborhoods}
-                showNeighborhoods={activeTab === 'neighborhoods'}
-              />
-            </APIProvider>
+          <div className={`${mobileView === 'map' ? 'flex' : 'hidden'} md:flex flex-1 flex-col`}>
+            {/* Filter bar */}
+            <div className="flex items-center gap-2 px-3 py-2 bg-white border-b border-gray-100 flex-shrink-0 flex-wrap">
+              {/* Type filters */}
+              <div className="flex items-center gap-1">
+                {TYPE_FILTERS.map(f => {
+                  const active = visibleTypes.has(f.key)
+                  return (
+                    <button
+                      key={f.key}
+                      onClick={() => toggleType(f.key)}
+                      className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold transition-all ${
+                        active ? f.activeColor : 'bg-gray-100 text-gray-400'
+                      }`}
+                    >
+                      <span>{f.emoji}</span>
+                      <span>{f.label}</span>
+                    </button>
+                  )
+                })}
+              </div>
 
+              <div className="w-px h-5 bg-gray-200 mx-1" />
+
+              {/* Display toggles */}
+              <div className="flex items-center gap-1">
+                <button
+                  onClick={() => setShowText(v => !v)}
+                  className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold transition-all ${
+                    showText ? 'bg-emerald-100 text-emerald-700' : 'bg-gray-100 text-gray-400'
+                  }`}
+                >
+                  🏷️ Text
+                </button>
+                <button
+                  onClick={() => setShowPhoto(v => !v)}
+                  className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold transition-all ${
+                    showPhoto ? 'bg-emerald-100 text-emerald-700' : 'bg-gray-100 text-gray-400'
+                  }`}
+                >
+                  🖼️ Photo
+                </button>
+              </div>
+            </div>
+
+            {/* Map */}
+            <div className="flex-1 relative">
+              <APIProvider apiKey={process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY ?? ''}>
+                <Map
+                  places={result.places}
+                  cityCenter={result.cityCenter}
+                  selectedPlace={selectedPlace}
+                  onSelectPlace={setSelectedPlace}
+                  neighborhoods={result.neighborhoods}
+                  showNeighborhoods={activeTab === 'neighborhoods'}
+                  visibleTypes={visibleTypes}
+                  showText={showText}
+                  showPhoto={showPhoto}
+                />
+              </APIProvider>
+            </div>
           </div>
           </div>
         </div>
