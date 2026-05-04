@@ -27,6 +27,7 @@ function DashboardInner() {
   const [error, setError] = useState('')
   const [selectedPlace, setSelectedPlace] = useState<Place | null>(null)
   const [activeTab, setActiveTab] = useState<Tab>('masjid')
+  const [mobileView, setMobileView] = useState<'map' | 'list'>('map')
 
   const cityParam = searchParams.get('city') ?? ''
 
@@ -142,9 +143,34 @@ function DashboardInner() {
       )}
 
       {!loading && !error && result && (
-        <div className="flex-1 flex overflow-hidden">
+        <div className="flex-1 flex flex-col overflow-hidden">
+          {/* Mobile view toggle */}
+          <div className="flex md:hidden border-b border-gray-200 bg-white flex-shrink-0">
+            <button
+              onClick={() => setMobileView('map')}
+              className={`flex-1 py-2.5 text-sm font-semibold transition-colors ${
+                mobileView === 'map'
+                  ? 'text-emerald-700 border-b-2 border-emerald-600'
+                  : 'text-gray-500'
+              }`}
+            >
+              🗺️ Map
+            </button>
+            <button
+              onClick={() => setMobileView('list')}
+              className={`flex-1 py-2.5 text-sm font-semibold transition-colors ${
+                mobileView === 'list'
+                  ? 'text-emerald-700 border-b-2 border-emerald-600'
+                  : 'text-gray-500'
+              }`}
+            >
+              📋 List
+            </button>
+          </div>
+
+          <div className="flex-1 flex overflow-hidden">
           {/* Sidebar */}
-          <aside className="w-80 xl:w-96 flex flex-col bg-white border-r border-gray-200 flex-shrink-0 overflow-hidden">
+          <aside className={`${mobileView === 'list' ? 'flex' : 'hidden'} md:flex w-full md:w-80 xl:w-96 flex-col bg-white border-r border-gray-200 flex-shrink-0 overflow-hidden`}>
             {/* Tabs */}
             <div className="flex border-b border-gray-200 flex-shrink-0">
               {TABS.map(tab => (
@@ -182,7 +208,7 @@ function DashboardInner() {
           </aside>
 
           {/* Map */}
-          <div className="flex-1 relative">
+          <div className={`${mobileView === 'map' ? 'flex' : 'hidden'} md:flex flex-1 relative`}>
             <APIProvider apiKey={process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY ?? ''}>
               <Map
                 places={result.places}
@@ -209,6 +235,7 @@ function DashboardInner() {
                 <span className="text-gray-600">Halal Meat</span>
               </div>
             </div>
+          </div>
           </div>
         </div>
       )}

@@ -86,17 +86,26 @@ export async function GET(request: NextRequest) {
 
   const { lat, lng, formattedAddress } = geocode
 
-  const [masjids, restaurants, meatShops] = await Promise.all([
-    searchPlaces(`mosque masjid islamic center in ${city}`, { lat, lng }),
+  const [masjids, islamicCenters, restaurants, cafes, meatShops] = await Promise.all([
+    searchPlaces(`mosque masjid in ${city}`, { lat, lng }),
+    searchPlaces(`islamic center muslim community center in ${city}`, { lat, lng }),
     searchPlaces(`halal restaurant food in ${city}`, { lat, lng }),
+    searchPlaces(`halal cafe coffee shop muslim owned in ${city}`, { lat, lng }),
     searchPlaces(`halal meat butcher shop grocery in ${city}`, { lat, lng }),
   ])
 
-  const allPlaces: Place[] = [
+  function dedupe<T extends { id: string }>(arr: T[]): T[] {
+    const seen = new Set<string>()
+    return arr.filter(p => seen.has(p.id) ? false : (seen.add(p.id), true))
+  }
+
+  const allPlaces: Place[] = dedupe([
     ...masjids.map(p => ({ ...p, type: 'masjid' as const })),
+    ...islamicCenters.map(p => ({ ...p, type: 'masjid' as const })),
     ...restaurants.map(p => ({ ...p, type: 'halal_restaurant' as const })),
+    ...cafes.map(p => ({ ...p, type: 'halal_restaurant' as const })),
     ...meatShops.map(p => ({ ...p, type: 'halal_meat' as const })),
-  ].map(p => ({
+  ]).map(p => ({
     ...p,
     distance: parseFloat(haversineDistance(lat, lng, p.lat, p.lng).toFixed(1)),
   }))

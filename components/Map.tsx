@@ -65,7 +65,13 @@ export default function Map({
   const [visibleTypes, setVisibleTypes] = useState<Set<string>>(
     new Set(['masjid', 'halal_restaurant', 'halal_meat'])
   )
-  const [showPhotos, setShowPhotos] = useState(true)
+  const [pinMode, setPinMode] = useState<'photo' | 'name' | 'pin'>('photo')
+
+  const PIN_MODES: { key: 'photo' | 'name' | 'pin'; label: string; icon: string }[] = [
+    { key: 'photo', label: 'Photo + Name', icon: '🖼️' },
+    { key: 'name', label: 'Name only', icon: '🏷️' },
+    { key: 'pin', label: 'Pins only', icon: '📍' },
+  ]
 
   function toggleType(type: string) {
     setVisibleTypes(prev => {
@@ -147,27 +153,42 @@ export default function Map({
           })}
         </div>
 
-        {/* Photo toggle */}
-        <button
-          onClick={() => setShowPhotos(p => !p)}
+        {/* Pin mode toggle */}
+        <div
           style={{
             background: 'white',
             borderRadius: 10,
             boxShadow: '0 2px 8px rgba(0,0,0,0.15)',
-            padding: '6px 10px',
-            border: 'none',
-            cursor: 'pointer',
-            fontSize: 12,
-            fontWeight: 600,
-            color: showPhotos ? '#059669' : '#6b7280',
+            padding: '6px 8px',
             display: 'flex',
-            alignItems: 'center',
-            gap: 5,
-            transition: 'all 0.15s',
+            flexDirection: 'column',
+            gap: 4,
           }}
         >
-          {showPhotos ? '🖼️ Photos on' : '📍 Names only'}
-        </button>
+          {PIN_MODES.map(m => (
+            <button
+              key={m.key}
+              onClick={() => setPinMode(m.key)}
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: 6,
+                padding: '4px 8px',
+                borderRadius: 6,
+                border: 'none',
+                cursor: 'pointer',
+                background: pinMode === m.key ? '#ecfdf5' : '#f3f4f6',
+                color: pinMode === m.key ? '#059669' : '#9ca3af',
+                fontWeight: 600,
+                fontSize: 12,
+                transition: 'all 0.15s',
+              }}
+            >
+              <span style={{ fontSize: 14 }}>{m.icon}</span>
+              {m.label}
+            </button>
+          ))}
+        </div>
       </div>
 
       {/* Place markers */}
@@ -183,42 +204,44 @@ export default function Map({
             onClick={() => onSelectPlace(isSelected ? null : place)}
           >
             <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', cursor: 'pointer' }}>
-              {/* Label card above pin */}
-              <div
-                style={{
-                  background: 'white',
-                  borderRadius: 8,
-                  boxShadow: isSelected
-                    ? '0 0 0 2px rgba(5,150,105,0.5), 0 4px 12px rgba(0,0,0,0.2)'
-                    : '0 2px 8px rgba(0,0,0,0.18)',
-                  overflow: 'hidden',
-                  width: 110,
-                  marginBottom: 4,
-                  border: isSelected ? `2px solid ${TYPE_COLOR[place.type]}` : '2px solid transparent',
-                  transition: 'all 0.15s',
-                }}
-              >
-                {showPhotos && photoUrl && (
-                  <img
-                    src={photoUrl}
-                    alt={place.name}
-                    style={{ width: '100%', height: 60, objectFit: 'cover', display: 'block' }}
-                    onError={e => { (e.target as HTMLImageElement).style.display = 'none' }}
-                  />
-                )}
+              {/* Label card above pin — hidden in pin-only mode */}
+              {pinMode !== 'pin' && (
                 <div
                   style={{
-                    padding: '3px 5px',
-                    fontSize: 10,
-                    fontWeight: 600,
-                    color: '#1f2937',
-                    lineHeight: 1.3,
-                    textAlign: 'center',
+                    background: 'white',
+                    borderRadius: 8,
+                    boxShadow: isSelected
+                      ? '0 0 0 2px rgba(5,150,105,0.5), 0 4px 12px rgba(0,0,0,0.2)'
+                      : '0 2px 8px rgba(0,0,0,0.18)',
+                    overflow: 'hidden',
+                    width: 110,
+                    marginBottom: 4,
+                    border: isSelected ? `2px solid ${TYPE_COLOR[place.type]}` : '2px solid transparent',
+                    transition: 'all 0.15s',
                   }}
                 >
-                  {place.name.length > 22 ? place.name.slice(0, 22) + '…' : place.name}
+                  {pinMode === 'photo' && photoUrl && (
+                    <img
+                      src={photoUrl}
+                      alt={place.name}
+                      style={{ width: '100%', height: 60, objectFit: 'cover', display: 'block' }}
+                      onError={e => { (e.target as HTMLImageElement).style.display = 'none' }}
+                    />
+                  )}
+                  <div
+                    style={{
+                      padding: '3px 5px',
+                      fontSize: 10,
+                      fontWeight: 600,
+                      color: '#1f2937',
+                      lineHeight: 1.3,
+                      textAlign: 'center',
+                    }}
+                  >
+                    {place.name.length > 22 ? place.name.slice(0, 22) + '…' : place.name}
+                  </div>
                 </div>
-              </div>
+              )}
 
               {/* Pin circle */}
               <div
