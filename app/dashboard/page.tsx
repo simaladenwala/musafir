@@ -220,21 +220,6 @@ function DashboardInner() {
               />
             </APIProvider>
 
-            {/* Legend */}
-            <div className="absolute bottom-6 right-4 bg-white rounded-xl shadow-lg p-3 text-xs space-y-1.5 pointer-events-none">
-              <div className="flex items-center gap-2">
-                <span className="w-3 h-3 rounded-full bg-emerald-600 inline-block" />
-                <span className="text-gray-600">Masjid</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <span className="w-3 h-3 rounded-full bg-amber-500 inline-block" />
-                <span className="text-gray-600">Halal Restaurant</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <span className="w-3 h-3 rounded-full bg-red-500 inline-block" />
-                <span className="text-gray-600">Halal Meat</span>
-              </div>
-            </div>
           </div>
           </div>
         </div>

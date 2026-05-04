@@ -77,7 +77,7 @@ export default function PlaceCard({
         {place.rating != null && (
           <span className="text-xs text-amber-600 font-medium">⭐ {place.rating}</span>
         )}
-        <span className="text-xs text-gray-400">📍 {place.distance} km</span>
+        <span className="text-xs text-gray-400">📍 {place.distance} mi</span>
         {place.isOpen === true && (
           <span className="text-xs text-emerald-600 font-semibold">Open now</span>
         )}

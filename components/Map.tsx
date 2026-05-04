@@ -100,16 +100,18 @@ export default function Map({
     >
       <MapController center={mapCenter} zoom={mapZoom} />
 
-      {/* Filter controls */}
+      {/* Filter bar — bottom left, above Google logo */}
       <div
         style={{
           position: 'absolute',
-          top: 12,
+          bottom: 90,
           left: 12,
           zIndex: 10,
           display: 'flex',
-          flexDirection: 'column',
+          flexDirection: 'row',
           gap: 6,
+          flexWrap: 'wrap',
+          maxWidth: 'calc(100vw - 80px)',
         }}
       >
         {/* Type toggles */}
@@ -118,10 +120,10 @@ export default function Map({
             background: 'white',
             borderRadius: 10,
             boxShadow: '0 2px 8px rgba(0,0,0,0.15)',
-            padding: '6px 8px',
+            padding: '5px 6px',
             display: 'flex',
-            flexDirection: 'column',
-            gap: 4,
+            flexDirection: 'row',
+            gap: 3,
           }}
         >
           {TYPE_FILTERS.map(f => {
@@ -130,49 +132,52 @@ export default function Map({
               <button
                 key={f.key}
                 onClick={() => toggleType(f.key)}
+                title={f.label}
                 style={{
                   display: 'flex',
                   alignItems: 'center',
-                  gap: 6,
+                  gap: 4,
                   padding: '4px 8px',
                   borderRadius: 6,
                   border: 'none',
                   cursor: 'pointer',
-                  background: active ? TYPE_COLOR[f.key] + '18' : '#f3f4f6',
+                  background: active ? TYPE_COLOR[f.key] + '22' : '#f3f4f6',
                   color: active ? TYPE_COLOR[f.key] : '#9ca3af',
                   fontWeight: 600,
-                  fontSize: 12,
+                  fontSize: 11,
                   transition: 'all 0.15s',
-                  opacity: active ? 1 : 0.6,
+                  opacity: active ? 1 : 0.55,
+                  whiteSpace: 'nowrap',
                 }}
               >
-                <span style={{ fontSize: 14 }}>{f.emoji}</span>
-                {f.label}
+                <span style={{ fontSize: 15 }}>{f.emoji}</span>
+                <span className="hidden sm:inline">{f.label}</span>
               </button>
             )
           })}
         </div>
 
-        {/* Pin mode toggle */}
+        {/* Pin mode toggles */}
         <div
           style={{
             background: 'white',
             borderRadius: 10,
             boxShadow: '0 2px 8px rgba(0,0,0,0.15)',
-            padding: '6px 8px',
+            padding: '5px 6px',
             display: 'flex',
-            flexDirection: 'column',
-            gap: 4,
+            flexDirection: 'row',
+            gap: 3,
           }}
         >
           {PIN_MODES.map(m => (
             <button
               key={m.key}
               onClick={() => setPinMode(m.key)}
+              title={m.label}
               style={{
                 display: 'flex',
                 alignItems: 'center',
-                gap: 6,
+                gap: 4,
                 padding: '4px 8px',
                 borderRadius: 6,
                 border: 'none',
@@ -180,12 +185,13 @@ export default function Map({
                 background: pinMode === m.key ? '#ecfdf5' : '#f3f4f6',
                 color: pinMode === m.key ? '#059669' : '#9ca3af',
                 fontWeight: 600,
-                fontSize: 12,
+                fontSize: 11,
                 transition: 'all 0.15s',
+                whiteSpace: 'nowrap',
               }}
             >
-              <span style={{ fontSize: 14 }}>{m.icon}</span>
-              {m.label}
+              <span style={{ fontSize: 15 }}>{m.icon}</span>
+              <span className="hidden sm:inline">{m.label}</span>
             </button>
           ))}
         </div>
@@ -285,7 +291,7 @@ export default function Map({
               {selectedPlace.rating && (
                 <span style={{ color: '#d97706' }}>⭐ {selectedPlace.rating}</span>
               )}
-              <span style={{ color: '#6b7280' }}>📍 {selectedPlace.distance} km</span>
+              <span style={{ color: '#6b7280' }}>📍 {selectedPlace.distance} mi</span>
               {selectedPlace.isOpen === true && (
                 <span style={{ color: '#059669', fontWeight: 600 }}>Open</span>
               )}
