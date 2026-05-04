@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import {
   Map as GoogleMap,
   AdvancedMarker,
@@ -62,6 +62,27 @@ export default function Map({
     : cityCenter
   const mapZoom = selectedPlace ? 16 : 11
 
+  const [visibleTypes, setVisibleTypes] = useState<Set<string>>(
+    new Set(['masjid', 'halal_restaurant', 'halal_meat'])
+  )
+  const [showPhotos, setShowPhotos] = useState(true)
+
+  function toggleType(type: string) {
+    setVisibleTypes(prev => {
+      const next = new Set(prev)
+      next.has(type) ? next.delete(type) : next.add(type)
+      return next
+    })
+  }
+
+  const visiblePlaces = places.filter(p => visibleTypes.has(p.type))
+
+  const TYPE_FILTERS = [
+    { key: 'masjid', label: 'Masjids', emoji: '🕌' },
+    { key: 'halal_restaurant', label: 'Eats', emoji: '🍽️' },
+    { key: 'halal_meat', label: 'Meat', emoji: '🥩' },
+  ]
+
   return (
     <GoogleMap
       mapId="musafir-map"
@@ -73,8 +94,84 @@ export default function Map({
     >
       <MapController center={mapCenter} zoom={mapZoom} />
 
+      {/* Filter controls */}
+      <div
+        style={{
+          position: 'absolute',
+          top: 12,
+          left: 12,
+          zIndex: 10,
+          display: 'flex',
+          flexDirection: 'column',
+          gap: 6,
+        }}
+      >
+        {/* Type toggles */}
+        <div
+          style={{
+            background: 'white',
+            borderRadius: 10,
+            boxShadow: '0 2px 8px rgba(0,0,0,0.15)',
+            padding: '6px 8px',
+            display: 'flex',
+            flexDirection: 'column',
+            gap: 4,
+          }}
+        >
+          {TYPE_FILTERS.map(f => {
+            const active = visibleTypes.has(f.key)
+            return (
+              <button
+                key={f.key}
+                onClick={() => toggleType(f.key)}
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 6,
+                  padding: '4px 8px',
+                  borderRadius: 6,
+                  border: 'none',
+                  cursor: 'pointer',
+                  background: active ? TYPE_COLOR[f.key] + '18' : '#f3f4f6',
+                  color: active ? TYPE_COLOR[f.key] : '#9ca3af',
+                  fontWeight: 600,
+                  fontSize: 12,
+                  transition: 'all 0.15s',
+                  opacity: active ? 1 : 0.6,
+                }}
+              >
+                <span style={{ fontSize: 14 }}>{f.emoji}</span>
+                {f.label}
+              </button>
+            )
+          })}
+        </div>
+
+        {/* Photo toggle */}
+        <button
+          onClick={() => setShowPhotos(p => !p)}
+          style={{
+            background: 'white',
+            borderRadius: 10,
+            boxShadow: '0 2px 8px rgba(0,0,0,0.15)',
+            padding: '6px 10px',
+            border: 'none',
+            cursor: 'pointer',
+            fontSize: 12,
+            fontWeight: 600,
+            color: showPhotos ? '#059669' : '#6b7280',
+            display: 'flex',
+            alignItems: 'center',
+            gap: 5,
+            transition: 'all 0.15s',
+          }}
+        >
+          {showPhotos ? '🖼️ Photos on' : '📍 Names only'}
+        </button>
+      </div>
+
       {/* Place markers */}
-      {places.map(place => {
+      {visiblePlaces.map(place => {
         const isSelected = selectedPlace?.id === place.id
         const photoUrl = place.photos[0]
           ? `/api/photo?name=${encodeURIComponent(place.photos[0])}`
@@ -101,7 +198,7 @@ export default function Map({
                   transition: 'all 0.15s',
                 }}
               >
-                {photoUrl && (
+                {showPhotos && photoUrl && (
                   <img
                     src={photoUrl}
                     alt={place.name}
